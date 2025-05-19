@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menstrual Cycle & Fertility Tracker By T'Charles</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #FFF0F5; /* Soft pink background */
+            color: #333;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #C2185B;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .container {
+            background-color: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #880E4F;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #F8BBD0;
+            border-radius: 8px;
+            box-sizing: border-box;
+            background-color: #FFF9FA;
+        }
+        button {
+            background-color: #E91E63;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            display: block;
+            margin: 25px auto;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background-color: #C2185B;
+        }
+        .calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+            margin-top: 25px;
+        }
+        .day {
+            padding: 12px 5px;
+            text-align: center;
+            border-radius: 8px;
+            position: relative;
+            min-height: 70px;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .day-header {
+            font-weight: bold;
+            background-color: #FCE4EC;
+            color: #AD1457;
+            padding: 10px;
+        }
+        .menstruation {
+            background-color: #FFCDD2;
+            color: #B71C1C;
+        }
+        .high-fertile {
+            background-color: #A5D6A7;
+            color: #1B5E20;
+        }
+        .medium-fertile {
+            background-color: #C8E6C9;
+            color: #2E7D32;
+        }
+        .ovulation {
+            background-color: #FFF59D;
+            color: #F57F17;
+            animation: pulse 2s infinite;
+        }
+        .safe {
+            background-color: #BBDEFB;
+            color: #0D47A1;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        .info-panel {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #FCE4EC;
+            border-radius: 10px;
+            border-left: 5px solid #E91E63;
+        }
+        .legend {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            padding: 5px 10px;
+            border-radius: 20px;
+            background-color: #FFF9FA;
+        }
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            margin-right: 8px;
+            border-radius: 50%;
+            border: 1px solid #F8BBD0;
+        }
+        .cycle-day {
+            font-size: 10px;
+            position: absolute;
+            bottom: 3px;
+            right: 3px;
+            color: #666;
+            font-weight: normal;
+        }
+        .recommendations {
+            margin-top: 25px;
+        }
+        .phase {
+            margin-bottom: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid;
+        }
+        .phase-title {
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 18px;
+        }
+        .current-day {
+            border: 3px solid #E91E63 !important;
+            transform: scale(1.05);
+            box-shadow: 0 0 10px rgba(233,30,99,0.3);
+        }
+        .danger-days {
+            background-color: #FFEBEE;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid #F44336;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌸 Menstrual Cycle & Fertility Tracker By T'Charles 🌸</h1>
+        
+        <div class="form-group">
+            <label for="lastPeriod">Last Menstrual Period (Start Date):</label>
+            <input type="date" id="lastPeriod" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="bleedingDays">Bleeding Duration:</label>
+            <select id="bleedingDays">
+                <option value="3">3 days</option>
+                <option value="4" selected>4 days</option>
+                <option value="5">5 days</option>
+                <option value="6">6 days</option>
+                <option value="7">7 days</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="cycleLength">Cycle Length:</label>
+            <select id="cycleLength">
+                <option value="26">26 days</option>
+                <option value="27">27 days</option>
+                <option value="28" selected>28 days</option>
+                <option value="29">29 days</option>
+                <option value="30">30 days</option>
+                <option value="31">31 days</option>
+            </select>
+        </div>
+        
+        <button onclick="generateCalendar()">Generate My Cycle Calendar</button>
+        
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color menstruation"></div>
+                <span>Menstruation</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color medium-fertile"></div>
+                <span>Fertile (Low Risk)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color high-fertile"></div>
+                <span>Fertile (High Risk)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color ovulation"></div>
+                <span>Ovulation (Peak)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color safe"></div>
+                <span>Safe Days</span>
+            </div>
+        </div>
+        
+        <div id="dangerDaysInfo" class="danger-days" style="display: none;">
+            <h3>⚠️ Danger Days (High Fertility)</h3>
+            <p id="dangerDaysRange"></p>
+            <p><strong>Ovulation Day:</strong> <span id="ovulationDayDisplay"></span></p>
+            <p>These are your most fertile days when pregnancy is most likely to occur.</p>
+        </div>
+        
+        <div id="calendarContainer"></div>
+        
+        <div id="infoPanel" class="info-panel" style="display: none;">
+            <h2>Your Cycle Information</h2>
+            <p id="nextCycleDate"></p>
+            <p id="currentPhase"></p>
+            
+            <div class="recommendations">
+                <h3>Cycle Phase Guide</h3>
+                
+                <div id="menstrualPhase" class="phase" style="border-color: #EF9A9A;">
+                    <div class="phase-title">🩸 Menstrual Phase (Days 1-5)</div>
+                    <p>• Rest and recover<br>
+                    • Eat iron-rich foods (spinach, red meat)<br>
+                    • Use heat pads for cramps<br>
+                    • Gentle yoga or walking<br>
+                    • Track your symptoms</p>
+                </div>
+                
+                <div id="follicularPhase" class="phase" style="border-color: #81C784;">
+                    <div class="phase-title">🌱 Follicular Phase (Days 6-11)</div>
+                    <p>• Energy is increasing<br>
+                    • Great for new projects<br>
+                    • Try intense workouts<br>
+                    • Eat fresh, light foods<br>
+                    • Socialize and connect</p>
+                </div>
+                
+                <div id="fertilePhase" class="phase" style="border-color: #4CAF50;">
+                    <div class="phase-title">💚 Fertile Window (Days 12-17)</div>
+                    <p><strong>Symptoms of Ovulation:</strong><br>
+                    • Egg-white cervical mucus<br>
+                    • Mild pelvic pain (mittelschmerz)<br>
+                    • Slight temperature rise<br>
+                    • Increased libido<br>
+                    • Breast tenderness</p>
+                    <p><strong>Recommendations:</strong><br>
+                    • Have sex if trying to conceive<br>
+                    • Use protection if avoiding pregnancy<br>
+                    • Stay hydrated</p>
+                </div>
+                
+                <div id="lutealPhase" class="phase" style="border-color: #64B5F6;">
+                    <div class="phase-title">🌙 Luteal Phase (Days 18-28)</div>
+                    <p>• Focus on organization<br>
+                    • Moderate exercise<br>
+                    • Eat complex carbs<br>
+                    • Practice stress relief<br>
+                    • Watch for PMS symptoms<br>
+                    • Prepare for next period</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function generateCalendar() {
+            const lastPeriod = new Date(document.getElementById('lastPeriod').value);
+            const bleedingDays = parseInt(document.getElementById('bleedingDays').value);
+            const cycleLength = parseInt(document.getElementById('cycleLength').value);
+            
+            if (isNaN(lastPeriod.getTime())) {
+                alert("Please enter your last period date to continue.");
+                return;
+            }
+            
+            // Calculate key dates
+            const ovulationDay = cycleLength - 14;
+            const fertileStart = ovulationDay - 5;  // High fertility starts 5 days before ovulation
+            const fertilePeakStart = ovulationDay - 2; // Peak fertility 2 days before ovulation
+            const nextPeriod = new Date(lastPeriod);
+            nextPeriod.setDate(nextPeriod.getDate() + cycleLength);
+            
+            // Display danger days info
+            document.getElementById('dangerDaysInfo').style.display = 'block';
+            document.getElementById('dangerDaysRange').innerHTML = 
+                `<strong>High Fertility Days:</strong> Days ${fertileStart}-${ovulationDay+1} of your cycle`;
+            document.getElementById('ovulationDayDisplay').textContent = `Day ${ovulationDay}`;
+            
+            // Create calendar
+            const calendarContainer = document.getElementById('calendarContainer');
+            calendarContainer.innerHTML = '';
+            
+            const calendarDiv = document.createElement('div');
+            calendarDiv.className = 'calendar';
+            
+            // Add day headers
+            const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            days.forEach(day => {
+                const dayHeader = document.createElement('div');
+                dayHeader.className = 'day day-header';
+                dayHeader.textContent = day;
+                calendarDiv.appendChild(dayHeader);
+            });
+            
+            // Show 4 weeks (28 days) starting from last period
+            const today = new Date();
+            for (let i = 0; i < 28; i++) {
+                const currentDate = new Date(lastPeriod);
+                currentDate.setDate(currentDate.getDate() + i);
+                
+                const dayDiv = document.createElement('div');
+                dayDiv.className = 'day';
+                dayDiv.textContent = currentDate.getDate();
+                
+                // Calculate day in cycle (1-based)
+                const dayInCycle = (i % cycleLength) + 1;
+                
+                const cycleDaySpan = document.createElement('span');
+                cycleDaySpan.className = 'cycle-day';
+                cycleDaySpan.textContent = `Day ${dayInCycle}`;
+                dayDiv.appendChild(cycleDaySpan);
+                
+                // Apply phase styling
+                if (dayInCycle <= bleedingDays) {
+                    dayDiv.classList.add('menstruation');
+                } else if (dayInCycle === ovulationDay) {
+                    dayDiv.classList.add('ovulation');
+                    dayDiv.title = 'Ovulation Day - Highest Fertility';
+                } else if (dayInCycle >= fertilePeakStart && dayInCycle <= ovulationDay + 1) {
+                    dayDiv.classList.add('high-fertile');
+                    dayDiv.title = 'High Fertility - Danger Day';
+                } else if (dayInCycle >= fertileStart && dayInCycle < fertilePeakStart) {
+                    dayDiv.classList.add('medium-fertile');
+                    dayDiv.title = 'Medium Fertility';
+                } else {
+                    dayDiv.classList.add('safe');
+                    dayDiv.title = 'Low Fertility - Safe Day';
+                }
+                
+                // Highlight today
+                if (currentDate.toDateString() === today.toDateString()) {
+                    dayDiv.classList.add('current-day');
+                    
+                    // Display current phase info
+                    let currentPhase = '';
+                    if (dayInCycle <= bleedingDays) {
+                        currentPhase = '🩸 Menstrual Phase: Rest and recover';
+                    } else if (dayInCycle <= fertileStart - 1) {
+                        currentPhase = '🌱 Follicular Phase: Energy is rising';
+                    } else if (dayInCycle >= fertileStart && dayInCycle <= ovulationDay + 1) {
+                        if (dayInCycle === ovulationDay) {
+                            currentPhase = '🔥 Ovulation Day: Peak fertility!';
+                        } else {
+                            currentPhase = '💚 Fertile Window: High chance of pregnancy';
+                        }
+                    } else {
+                        currentPhase = '🌙 Luteal Phase: PMS may occur';
+                    }
+                    
+                    document.getElementById('currentPhase').innerHTML = 
+                        `<strong>Today (${formatDate(currentDate)}):</strong> ${currentPhase}`;
+                }
+                
+                calendarDiv.appendChild(dayDiv);
+            }
+            
+            calendarContainer.appendChild(calendarDiv);
+            
+            // Show info panel
+            document.getElementById('infoPanel').style.display = 'block';
+            document.getElementById('nextCycleDate').innerHTML = 
+                `<strong>Next period expected:</strong> ${formatDate(nextPeriod)}`;
+        }
+        
+        function formatDate(date) {
+            const options = { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' };
+            return date.toLocaleDateString('en-US', options);
+        }
+        
+        // Set default date to today
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date();
+            const formattedDate = today.toISOString().substr(0, 10);
+            document.getElementById('lastPeriod').value = formattedDate;
+        });
+    </script>
+</body>
+</html>
